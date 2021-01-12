@@ -1,0 +1,24 @@
+_schema-version: "2.1"
+ID: monitor
+version: 0.0.1
+modules:
+- name: db
+  type: hdb
+  path: db
+  requires:
+  - name: hana-monitoring
+  - name: hdi_db
+    properties:
+      TARGET_CONTAINER: ~{hdi-container-name}
+resources:
+- name: hdi_db
+  type: com.sap.xs.hdi-container
+  parameters:
+    config:
+      schema: MONITOR
+  properties:
+    hdi-container-name: ${service-name}
+- name: hana-monitoring
+  type: org.cloudfoundry.existing-service
+  parameters:
+    service-name: hana-monitoring

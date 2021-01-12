@@ -1,0 +1,14 @@
+{
+    "hana-monitoring": {
+        "object_owner": {
+            "roles": [
+                "monitor::external_access_g"
+            ]
+        },
+        "application_user": {
+            "roles": [
+                "monitor::external_access"
+            ]
+        }
+    }
+}

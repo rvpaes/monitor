@@ -1,0 +1,13 @@
+{
+    "role": {
+    "name": "analytics",
+     "schema_privileges": [
+        {
+            "privileges": [
+                 "SELECT",
+                 "EXECUTE"
+            ]
+        }
+    ]
+    }
+}

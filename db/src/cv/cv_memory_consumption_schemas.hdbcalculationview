@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" xmlns:DataFoundation="http://www.sap.com/ndb/BiModelDataFoundation.ecore" xmlns:Dimension="http://www.sap.com/ndb/BiModelDimension.ecore" id="cv_memory_consumption_schemas" applyPrivilegeType="NONE" dataCategory="CUBE" schemaVersion="3.0" outputViewType="Aggregation" cacheInvalidationPeriod="NONE" enforceSqlExecution="false">
+<descriptions defaultDescription="Memory consumption of schemas (loaded tables) in MB"/>
+<localVariables/>
+<variableMappings/>
+<dataSources>
+  <DataSource id="M_CS_TABLES">
+    <resourceUri>M_CS_TABLES</resourceUri>
+  </DataSource>
+  <DataSource id="M_TABLES">
+    <resourceUri>M_TABLES</resourceUri>
+  </DataSource>
+</dataSources>
+<calculationViews>
+  <calculationView xsi:type="Calculation:ProjectionView" id="Projection_1" filterExpressionLanguage="SQL">
+    <viewAttributes>
+      <viewAttribute id="SCHEMA_NAME"/>
+      <viewAttribute id="TABLE_NAME"/>
+      <viewAttribute id="LOADED"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <input node="M_CS_TABLES"/>
+    <filter>&quot;LOADED&quot;!='No'</filter>
+  </calculationView>
+  <calculationView xsi:type="Calculation:ProjectionView" id="Projection_2" filterExpressionLanguage="SQL">
+    <viewAttributes>
+      <viewAttribute id="SCHEMA_NAME"/>
+      <viewAttribute id="TABLE_NAME"/>
+      <viewAttribute id="TABLE_SIZE"/>
+      <viewAttribute id="IS_COLUMN_TABLE"/>
+    </viewAttributes>
+    <calculatedViewAttributes>
+      <calculatedViewAttribute id="TABLE_SIZE_MB" datatype="DECIMAL" length="20" scale="2" expressionLanguage="SQL">
+        <formula>ROUND(&quot;TABLE_SIZE&quot;/1024/1024,2)</formula>
+      </calculatedViewAttribute>
+    </calculatedViewAttributes>
+    <input node="M_TABLES"/>
+    <filter>&quot;IS_COLUMN_TABLE&quot;='FALSE' or &quot;IS_COLUMN_TABLE&quot;='TRUE'</filter>
+  </calculationView>
+  <calculationView xsi:type="Calculation:JoinView" id="Join_1" cardinality="CN_N" joinType="inner">
+    <viewAttributes>
+      <viewAttribute id="SCHEMA_NAME"/>
+      <viewAttribute id="TABLE_NAME"/>
+      <viewAttribute id="TABLE_SIZE_MB" aggregationType="sum"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <input node="Projection_2">
+      <mapping xsi:type="Calculation:AttributeMapping" target="SCHEMA_NAME" source="SCHEMA_NAME"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TABLE_NAME" source="TABLE_NAME"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TABLE_SIZE_MB" source="TABLE_SIZE_MB"/>
+    </input>
+    <input node="Projection_1">
+      <mapping xsi:type="Calculation:AttributeMapping" target="SCHEMA_NAME" source="SCHEMA_NAME"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TABLE_NAME" source="TABLE_NAME"/>
+    </input>
+    <joinAttribute name="SCHEMA_NAME"/>
+    <joinAttribute name="TABLE_NAME"/>
+  </calculationView>
+</calculationViews>
+
+<logicalModel id="Join_1">
+  <attributes>
+    <attribute id="SCHEMA_NAME" order="1" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="Schema Named 2"/>
+      <keyMapping columnObjectName="Join_1" columnName="SCHEMA_NAME"/>
+    </attribute>
+    <attribute id="TABLE_NAME" order="2" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="Table Name"/>
+      <keyMapping columnObjectName="Join_1" columnName="TABLE_NAME"/>
+    </attribute>
+  </attributes>
+  <calculatedAttributes/>
+  <baseMeasures>
+    <measure id="TABLE_SIZE_MB" order="3" aggregationType="sum" measureType="simple">
+      <descriptions defaultDescription="Table Size (MB)"/>
+      <measureMapping columnObjectName="Join_1" columnName="TABLE_SIZE_MB"/>
+    </measure>
+  </baseMeasures>
+  <calculatedMeasures/>
+  <restrictedMeasures/>
+  <localDimensions>
+    <localDimension id="OBJECTS">
+      <attributeRef xsi:type="DataFoundation:Attribute">SCHEMA_NAME</attributeRef>
+      <attributeRef xsi:type="DataFoundation:Attribute">TABLE_NAME</attributeRef>
+      <hierarchies>
+        <hierarchy xsi:type="Dimension:LeveledHierarchy" id="OBJECTS" aggregateAllNodes="false" orphanedNodesHandling="ROOT_NODES" rootNodeVisibility="ADD_ROOT_NODE" withRootNode="true" nodeStyle="NAME_PATH_ENFORCED" cacheEnabled="true" cycleHandling="BREAKUP" emptyValueIsNull="true">
+          <descriptions defaultDescription="Objects"/>
+          <unassignedMemberProperties mode="FALSE"/>
+          <levels>
+            <level levelAttribute="SCHEMA_NAME" levelType="MDLEVEL_TYPE_REGULAR" order="1" orderAttribute="SCHEMA_NAME" sortDirection="ASC"/>
+            <level levelAttribute="TABLE_NAME" levelType="MDLEVEL_TYPE_REGULAR" order="2" orderAttribute="TABLE_NAME" sortDirection="ASC"/>
+          </levels>
+        </hierarchy>
+      </hierarchies>
+    </localDimension>
+  </localDimensions>
+</logicalModel>
+<layout>
+  <shapes>
+    <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="221" y="112"/>
+    
+      <rectangleSize width="160"/>
+    </shape>
+    
+  
+    <shape expanded="true" modelObjectName="Projection_1" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="302" y="356"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape expanded="true" modelObjectName="Projection_2" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="92" y="356"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape expanded="true" modelObjectName="Join_1" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="221" y="217"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape modelObjectName="Projection_2" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput">
+      <upperLeftCorner x="20" y="30"/>
+      <rectangleSize width="190"/>
+    </shape>
+    <shape modelObjectName="Projection_1" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput">
+      <upperLeftCorner x="320" y="30"/>
+      <rectangleSize width="170"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario>

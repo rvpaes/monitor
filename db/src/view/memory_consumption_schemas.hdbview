@@ -1,0 +1,13 @@
+VIEW "memory_consumption_schemas" 
+AS 
+    SELECT SCHEMA_NAME, 
+	       TO_DECIMAL(ROUND(SUM (TABLE_SIZE)/1024/1024,2),20,2) "SCHEMA_SIZE_MB" 
+        FROM M_TABLES 
+        WHERE   (IS_COLUMN_TABLE = 'FALSE') OR 
+		        (IS_COLUMN_TABLE = 'TRUE' AND 
+			    (SCHEMA_NAME,TABLE_NAME) IN (
+				    SELECT DISTINCT SCHEMA_NAME,TABLE_NAME 
+					    FROM M_CS_TABLES WHERE LOADED <> 'NO' )
+                ) 
+        GROUP BY SCHEMA_NAME 
+        ORDER BY "SCHEMA_SIZE_MB" desc

@@ -1,0 +1,14 @@
+{
+    "M_TABLES": {
+        "target": {
+            "object": "M_TABLES",
+            "schema": "SYS"
+        }
+    },
+    "M_CS_TABLES": {
+        "target": {
+            "object": "M_CS_TABLES",
+            "schema": "SYS"
+        }
+    }
+}
